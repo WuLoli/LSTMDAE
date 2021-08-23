@@ -96,17 +96,25 @@ def zero_mask(X_train, p):
 # set up data
 X_train, Y_train, X_validation, Y_validation, X_test, Y_test, modulation_index = set_up_data(data_path, file_name)
 
-X_train = np.moveaxis(X_train, 1, 2)
-X_validation = np.moveaxis(X_validation, 1, 2)
-X_test = np.moveaxis(X_test, 1, 2)
+for i in range(Y_train.shape[0]):
+    Y_train[i, 0] = modulation_index[Y_train[i, 0]]
+    
+for i in range(Y_validation.shape[0]):
+    Y_validation[i, 0] = modulation_index[Y_validation[i, 0]]
+
+for i in range(Y_test.shape[0]):
+    Y_test[i, 0] = modulation_index[Y_test[i, 0]] 
+    
+X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], X_train.shape[2]))
+Y_train = Y_train.astype(int)
+X_validation = X_validation.reshape((X_validation.shape[0], X_validation.shape[1], X_validation.shape[2]))
+Y_validation = Y_validation.astype(int)
+X_test = X_test.reshape((X_test.shape[0], X_test.shape[1], X_test.shape[2]))
+Y_test = Y_test.astype(int)
 
 X_train = get_amp_phase(X_train)
 X_validation = get_amp_phase(X_validation)
 X_test = get_amp_phase(X_test)
-
-Y_train = Y_train.astype(int)
-Y_validation = Y_validation.astype(int)
-Y_test = Y_test.astype(int)
 
 encoder_inputs = tf.keras.Input(shape = (X_train.shape[1], X_train.shape[2]),
                                 name = 'encoder_inputs')
@@ -116,7 +124,7 @@ encoder_1, state_h_1, state_c_1 = tf.keras.layers.CuDNNLSTM(units = 32,
                                     return_state = True,
                                     name = 'encoder_1')(encoder_inputs)
 
-drop_prob = 0.2
+drop_prob = 0
 drop_1 = tf.keras.layers.Dropout(drop_prob, name = 'drop_1')(encoder_1)
 
 encoder_2, state_h_2, state_c_2 = tf.keras.layers.CuDNNLSTM(units = 32,
@@ -128,7 +136,7 @@ decoder = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(2),
                                           name = 'decoder')(encoder_2)
 
 # 3 Dense layers for classification with bn
-clf_dropout = 0.2
+clf_dropout = 0
 
 clf_dense_1 = tf.keras.layers.Dense(units = 32,
                                     activation = tf.nn.relu,
@@ -169,7 +177,7 @@ val_acc = []
 
 
 for ite in range(150):
-    X_train_masked = zero_mask(X_train, 0.1)
+    X_train_masked = zero_mask(X_train, 0)
     print(ite)
     history = model.fit(x = X_train,
                         y = [X_train, tf.keras.utils.to_categorical(Y_train[:, 0])],
