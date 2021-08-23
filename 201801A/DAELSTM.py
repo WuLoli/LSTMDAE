@@ -128,7 +128,7 @@ encoder_1, state_h_1, state_c_1 = tf.keras.layers.CuDNNLSTM(units = 32,
                                     return_state = True,
                                     name = 'encoder_1')(encoder_inputs)
 
-drop_prob = 0.2
+drop_prob = 0
 drop_1 = tf.keras.layers.Dropout(drop_prob, name = 'drop_1')(encoder_1)
 
 encoder_2, state_h_2, state_c_2 = tf.keras.layers.CuDNNLSTM(units = 32,
@@ -140,7 +140,7 @@ decoder = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(2),
                                           name = 'decoder')(encoder_2)
 
 # 3 Dense layers for classification with bn
-clf_dropout = 0.2
+clf_dropout = 0
 
 clf_dense_1 = tf.keras.layers.Dense(units = 32,
                                     activation = tf.nn.relu,
@@ -181,7 +181,7 @@ val_acc = []
 
 
 for ite in range(150):
-    X_train_masked = zero_mask(X_train, 0.1)
+    X_train_masked = zero_mask(X_train, 0)
     print(ite)
     history = model.fit(x = X_train,
                         y = [X_train, tf.keras.utils.to_categorical(Y_train[:, 0])],
