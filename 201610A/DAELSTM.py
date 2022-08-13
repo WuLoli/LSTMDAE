@@ -1,6 +1,6 @@
 import os
 os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES']= '0'
+os.environ['CUDA_VISIBLE_DEVICES']= '1'
 import numpy as np
 import pickle
 import tensorflow as tf
@@ -175,14 +175,12 @@ best = 0
 train_acc = []
 val_acc = []
 
-
 for ite in range(150):
-    X_train_masked = zero_mask(X_train, 0)
-    print(ite)
+    X_train_masked = zero_mask(X_train, 0.1)
     history = model.fit(x = X_train,
                         y = [X_train, tf.keras.utils.to_categorical(Y_train[:, 0])],
                         validation_data = (X_validation, [X_validation, tf.keras.utils.to_categorical(Y_validation[:, 0])]),
-                        batch_size = 128,
+                        batch_size = 400,
                         epochs = 1)
     
     train_acc.append(history.history['softmax_acc'][0])
