@@ -163,7 +163,7 @@ model = tf.keras.Model(inputs = encoder_inputs, outputs = [decoder, softmax])
 model.summary()
 
 
-learning_rate = 10 ** -3
+learning_rate = 10 ** -2
 lam = 0.1
 
 model.compile(loss = ['mean_squared_error', 'categorical_crossentropy'],
@@ -190,13 +190,13 @@ for ite in range(150):
 
     if history.history['val_softmax_acc'][0] > best:
         best = history.history['val_softmax_acc'][0]
-        model.save('DAELSTM.h5')
+        model.save('DAELSTM_test.h5')
 
     with open('val_result.txt', 'a') as f:
         f.write(str(history.history['val_softmax_acc'][0] * 100) + '\n')
         
 
-clf = tf.keras.models.load_model('DAELSTM.h5')
+clf = tf.keras.models.load_model('DAELSTM_test.h5')
 
 res = clf.predict(X_test)[1]
 res = np.argmax(res, axis = 1)
